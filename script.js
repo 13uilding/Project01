@@ -1,4 +1,4 @@
-import { createMarker, populateMarkers, getLocation } from "./scripts/google";
+import {createMarker, getLocation, populateMarkers, testerino} from "./scripts/google.js";
 
 // HTML Variables
 var h1 = $("h1");
@@ -6,10 +6,6 @@ var container = $('.container');
 var eventForm = $("form")
 
 // Time Variables:
-var now;
-var nowUTC;
-var nowDateTime;
-var selectedDate;
 var startDate = 0;
 var endDate = 0;
 var days = [];
@@ -21,7 +17,7 @@ for(let i = 1; i < 32; i++){
     days.push(String(day));
 };
 var months = days.slice(0, 12);
-var years = [2020, 2021, 2022, 2023, 2024, 2025];
+var years = [];
 
 // Ticketmaster Variables
 var nextBtn = $("#next");
@@ -34,8 +30,7 @@ var size = 10; // 40 results will be created
 var storedEvents = {};
 var city = "denver";
 
-// Google Variables
-var latLng;
+
 
 
 // Event Listeners
@@ -60,26 +55,48 @@ prevBtn.on("click", function(e){
 // API
 eventForm.on("submit", function(event){
     event.preventDefault();
+    // Form control
+    let startYear = $(`#startYear option:selected`)
+    let endYear = $(`#endYear option:selected`)
+    let startMonth = $(`#startMonth option:selected`)
+    let endMonth = $(`#endMonth option:selected`)
+    let startDay = $(`#startDay option:selected`)
+    let endDay = $(`#endDay option:selected`)
+
+    // Add validation here
+    if (startYear.val() > endYear.val()) {
+        alert("START YEAR cannot be GREATER THAN the END YEAR.")
+        return
+    }
+    if (startYear.val() === endYear.val()) {
+        if (startMonth.val() > endMonth.val()) {
+            alert("START MONTH cannot be GREATER THAN the END MONTH.")
+            return
+        }
+    }
+    if (startMonth.val() === endMonth.val()) {
+        if (startDay.val() >= endDay.val()) {
+            alert("START DAY cannot be GREATER THAN OR EQUAL TO the END DAY.")
+        }
+        return
+    }
+
     storedEvents = {};
-    price = $("#price").val();
-    queryDate = $("#date").val();
-    typeEvent = $("#segment").val();
+    // price = $("#price").val();
+    // queryDate = $("#date").val();
+    // typeEvent = $("#segment").val();
     currentPage = 0;
     getEvents(currentPage);
 });
 
 // Functions
-function formOptionFiller(time){
-    for(day of days){
-        $(`#${time}Day`).append(`<option value=${day}>${day}</option>`);
-    };
-    for(month of months){
-        $(`#${time}Month`).append(`<option value=${month}>${month}</option>`);
-    };
-    for(year of years){
-        $(`#${time}Year`).append(`<option value=${year}>${year}</option>`);
-    };
-
+function formOptionFiller(time, year, month, day){
+    days.map(day => {$(`#${time}Day`).append(`<option value=${day}>${day}</option>`)})
+    months.map(month => {$(`#${time}Month`).append(`<option value=${month}>${month}</option>`)})
+    years.map(year => {$(`#${time}Year`).append(`<option value=${year}>${year}</option>`)})
+    $(`#${time}Year`).val(year);
+    $(`#${time}Month`).val(month);
+    $(`#${time}Day`).val(day);
 }
 
 function dateFormater(time){
@@ -125,7 +142,7 @@ function getEvents(page) {
     // var latlong = position.coords.latitude + "," + position.coords.longitude;
     startDate = dateFormater("start");
     endDate = dateFormater("end");
-    queryURL = queryURLFiller(typeEvent, startDate, endDate, size, page);
+    let queryURL = queryURLFiller(typeEvent, startDate, endDate, size, page);
 
 
     $.ajax({
@@ -232,18 +249,23 @@ function pageTurn(increment, page){
 
 
 // Initialization
-function momentConfig(){
-    now = moment();    
-    nowUTC = now.utc(String).format();
+async function momentConfig(){
+    let now = moment();    
+    let [year, month, dayHour] = await now.utc(String).format().split("-");
+    console.log(year, month, dayHour);
+    years.push(year)
+    years.push(parseInt(year) + 1)
+    formOptionFiller("start", year, month, dayHour.slice(0,2));
+    formOptionFiller("end", year, month, dayHour.slice(0,2));
 }
 
-function init(){
+function init(cb){
     h1.text("Plan a date")
     container.hide();
     momentConfig();
-    getLocation();
-    formOptionFiller("start");
-    formOptionFiller("end");
+    let location = getLocation();
+    testerino();
+    return cb(location)
 };
 
-init();
+init(location => console.log(location));

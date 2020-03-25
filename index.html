@@ -44,20 +44,17 @@
     </Header>
     <div class="row formRow">
         <div class="four columns searchForm">
-            <form action="/action_page.php">
+            <form>
                 <!-- <label for="price">Price</label>
                 <input type="text" id="price" name="price" placeholder="Maximum Price"> -->
                 <div class="row">
                     <div class="columns dateForm">
                         <label for="endYear">Start</label>
                         <select id="startYear" name="Year">
-                            <option value="year">Year</option>
                         </select>
                         <select id="startMonth" name="Month">
-                            <option value="month">Month</option>
                         </select>
                         <select id="startDay" name="Day">
-                            <option value="day">Day</option>
                         </select> 
                     </div>
                 </div>
@@ -248,14 +245,30 @@
     <div style="font-size: x-small;">
         Website Collaboration By: Dan Brown, Charles Cressey, and Rayna Williams
         <br>
-        Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+        Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+    </div>
 
 
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYVpgUMNSWXZ7qZmwkQN-d5KPe1OFV_KM">
     </script>
     <script src="lib/moment/moment.min.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>
+
+<!--
+    Inside of project-two/routes/api/games.js
+        Must be a node file 
+    router.get("/search/atlas/:title", function(req, res) {
+    const title = req.params.title;
+    const apiKey = process.env.BOARDGAMEATLAS_KEY
+    axios.get(`https://www.boardgameatlas.com/api/search?name=${title}&client_id=${apiKey}`)
+      .then(response => {
+        res.json(response.data);
+      }).catch(err => {
+        console.log("We have a problem");
+        throw err;
+      });
+  }); -->
